@@ -1,7 +1,7 @@
 {
   "name": "cryptochain",
   "version": "1.0.0",
-  "description": "",
+  "description": "A full stack blockchain application.",
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll"
@@ -10,5 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "jest": "^24.9.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhruvkhanna38/MyCryptochain.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dhruvkhanna38/MyCryptochain/issues"
+  },
+  "homepage": "https://github.com/dhruvkhanna38/MyCryptochain#readme"
 }
