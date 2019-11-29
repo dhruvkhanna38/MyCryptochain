@@ -1,4 +1,4 @@
-const cryptoHash = require("./cryptoHash.js");
+const cryptoHash = require("./cryptoHash");
 
 describe("cryptoHash()" ,  function(){
         it("Generate the same hash" , function(){

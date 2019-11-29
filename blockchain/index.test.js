@@ -1,5 +1,6 @@
-const BlockChain = require("./blockChain");
+const BlockChain = require("./index");
 const Block = require("./block");
+const cryptoHash = require("../util/cryptoHash");
 
 
 describe("BlockChain" , function(){
@@ -54,6 +55,20 @@ describe("BlockChain" , function(){
                                     expect(BlockChain.isValidChain(blockChain.chain)).toEqual(false);
                                 });
                         });
+                        describe("the chain contains a block with a jumped difficulty", function(){
+                                it("return false" , function(){
+                                    const lastBlock = blockChain.chain[blockChain.chain.length-1];
+                                    const lastHash =  lastBlock.hash;
+                                    const timestamp = Date.now();
+                                    const nonce = 0;
+                                    const data = [];
+                                    const difficulty = lastBlock.difficulty - 3;
+                                    const hash = cryptoHash(timestamp , lastHash , nonce, difficulty,data);
+                                    const badBlock = new Block({lastHash, hash, nonce,difficulty, data,timestamp});
+                                    blockChain.chain.push(badBlock);
+                                    expect(BlockChain.isValidChain(blockChain.chain)).toEqual(false);
+                                }); 
+                        });
                         describe("the chain does not contain any invalid blocks" , function(){
                                 it("return true", function(){
                                     blockChain.addBlock({data : "harry"});
@@ -66,11 +81,27 @@ describe("BlockChain" , function(){
         });
 
             describe("replaceChain()" , function(){
+
+                beforeEach(function(){
+                    errorMock = jest.fn();
+                    logMock = jest.fn();
+
+                    global.console.error = errorMock;
+                    global.console.log = logMock;
+
+                });
+
+
                 describe("when the chain is not longer" , function(){
                     it("it does not replace the chian" , function(){
                             newChain.chain[0] = {new : "chain"};
                             blockChain.replaceChian(newChain.chain);
                             expect(blockChain.chain).toEqual(orignalChain);
+                    });
+                    it("logs an error" , function(){
+                        newChain.chain[0] = {new : "chain"};
+                        blockChain.replaceChian(newChain.chain);
+                        expect(errorMock).toHaveBeenCalled();
                     });
                 });
                 describe("when the chain is longer" , function(){
@@ -84,11 +115,29 @@ describe("BlockChain" , function(){
                             expect(blockChain.chain).toEqual(orignalChain);
 
                         });
+                        it("logs an error" , function(){
+                            newChain.addBlock({data : "harry"});
+                            newChain.addBlock({data : "ron"});
+                            newChain.addBlock({data : "hermione"});
+                            newChain.chain[2].lastHash = "broken-lasthash";
+                            blockChain.replaceChian(newChain.chain);
+                            expect(errorMock).toHaveBeenCalled();
+                        });
                     });
                     describe("if the chain is valid" , function(){
                         it("it does replace the chain" , function(){
+                            newChain.addBlock({data : "harry"});
+                            newChain.addBlock({data : "ron"});
+                            newChain.addBlock({data : "hermione"});
                             blockChain.replaceChian(newChain.chain);
-                            expect(blockChain.chain).toEqual(orignalChain);
+                            expect(blockChain.chain).toEqual(newChain.chain);
+                        });
+                        it("chain has been replaced" , function(){
+                            newChain.addBlock({data : "harry"});
+                            newChain.addBlock({data : "ron"});
+                            newChain.addBlock({data : "hermione"});
+                            blockChain.replaceChian(newChain.chain);
+                            expect(logMock).toHaveBeenCalled();
                         });
                     });
                     

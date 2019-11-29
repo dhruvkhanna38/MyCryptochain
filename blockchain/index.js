@@ -1,5 +1,5 @@
 const Block = require("./block");
-const cryptoHash = require("./cryptoHash");
+const cryptoHash = require("../util/cryptoHash");
 
 
 
@@ -29,11 +29,20 @@ class BlockChain {
                     if(actualLastHash !== storedLastHash){
                         return false;
                     }
-                    const validatedhash = cryptoHash(chain[i].timestamp, chain[i].lastHash , chain[i].data);
+                    const validatedhash = cryptoHash(chain[i].timestamp, chain[i].lastHash , chain[i].data, chain[i].nonce, chain[i].difficulty);
                     
                     if(chain[i].hash  != validatedhash){
                         return false;
                     }
+                }
+                var flag = true;
+                for(var i=1;i<chain.length;i++){
+                    if(Math.abs(chain[i-1].difficulty - chain[i].difficulty > 1)){
+                        flag = false;
+                    }
+                }
+                if(!flag){
+                    return false;
                 }
                 return true;
         }
